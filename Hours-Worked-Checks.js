@@ -1,26 +1,28 @@
-// Check for days of work with less than 10 hours of rest.
+// Just looking to terminate the function as soon as a day with less than 10hrs of rest is found. 
 function dailyHoursRest(array) {
     for (day of array) {
         if (day.hours_rest < 10) {
-            return false;
-        } else {
-            console.log('less than 10 hours of rest')
-            return true;
-        }
+          console.log('Not enough sleep');
+          return;
+        } 
     }
 }
-//
 
 function leastHoursOff(array, result = [], index = 0) {
+    // Slicing array in increments of 7
     let slicedArray = array.slice(index, index + 7);
+    // Base case (terminal case?), where as soon as there are fewer than 7 days, return the result array. 
     if (slicedArray.length < 7) {
         return result;        
     }
-
     const reducer = (accumulator, currentValue) => accumulator + currentValue;
+    // Adding up the values of the 7-day increment arrays, returns a single number for the total.
     let reducedArray = slicedArray.reduce(reducer);
+    // newResult speards the 'result' array with the 'reducedArray' number (which gives the return value of this function).
     const newResult = [...result, reducedArray];
+    // Increase index to move on to next chunk of days.
     const newIndex = index + 1;
+    // return the value of this function.
     return leastHoursOff(array, newResult, newIndex);
 }
 
@@ -151,10 +153,13 @@ let workDayDetails = [
     
 ]
 
+// Create array of hours_rest, instead of having to move through the object in functions. 
 const workDayHours = workDayDetails.map( (item) =>  item.hours_rest);
 
+// Value returned from 'leastHoursOff' Function, array containing the total hours_rest per 7-day increment. 
 let result = leastHoursOff(workDayHours);
-
+// Finds the lowest value of this array (have to spead array because Math.min expects numbers)
 let minimum = Math.min(...result);
 
-console.log(minimum)
+dailyHoursRest(workDayDetails)
+console.log('Shortest number of hours_rest per 7-day period: ', minimum)
