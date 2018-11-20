@@ -1,53 +1,28 @@
-// Create array of hours off for all days included in the Hours of Work Object.
-function restHoursArrayFunction(array) {
-    let restHoursArray = [];
+// Check for days of work with less than 10 hours of rest.
+function dailyHoursRest(array) {
     for (day of array) {
-        restHoursArray.push(day.hours_rest);
-    }
-    return restHoursArray;
-}
-
-// Returns 'hours of rest' array containing only seven days, based on desired 'startDate'.
-function sevenDayIncrements(callback, startDate) {
-    let restEachDay = [];
-    for(let i = startDate-1; i < (startDate + 6); i++) {
-        restEachDay.push(callback[i]);
-    }
-    return restEachDay;
-}
-
-// Returns a number which is the total hours off per specified 7 day period.
-function totalHoursOff(sevenDayIncrements) {
-    totalHours = 0;
-    for (let i = 0; i < sevenDayIncrements.length; i++) {
-        totalHours += sevenDayIncrements[i];
-    }
-    return totalHours;
-}
-
-// Returns array with just the days that have 10 hours off or more, using filter method.
-function hoursOffPerDay(sevenDayIncrements) {
-    let result = sevenDayIncrements.filter(hours => hours >= 10);
-    return result;
-}
-
-// FINAL function: validates whether 77 hours off occured in any given 7 day period - validate if the array of hours off per day has 7 items or not.
-function validateConditions(array, startDate) {
-    let timeOff = totalHoursOff(sevenDayIncrements(restHoursArrayFunction(array), startDate));
-    let tenHoursOff = hoursOffPerDay(sevenDayIncrements(restHoursArrayFunction(array), startDate));
-    
-    if (timeOff > 77 ) {
-        console.log('true', timeOff);
-    } else {
-        console.log('false', timeOff);
-    }
-    if (tenHoursOff.length >= 7) {
-        console.log('true', tenHoursOff);
-    } else {
-        console.log('false', tenHoursOff.length);
+        if (day.hours_rest < 10) {
+            return false;
+        } else {
+            console.log('less than 10 hours of rest')
+            return true;
+        }
     }
 }
+//
 
+function leastHoursOff(array, result = [], index = 0) {
+    let slicedArray = array.slice(index, index + 7);
+    if (slicedArray.length < 7) {
+        return result;        
+    }
+
+    const reducer = (accumulator, currentValue) => accumulator + currentValue;
+    let reducedArray = slicedArray.reduce(reducer);
+    const newResult = [...result, reducedArray];
+    const newIndex = index + 1;
+    return leastHoursOff(array, newResult, newIndex);
+}
 
 let workDayDetails = [
     //Oct 10, 12am-4am; 12pm-4pm
@@ -176,5 +151,10 @@ let workDayDetails = [
     
 ]
 
-// SPECIFY WHICH ARRAY OF HOURS WORKED AND START DATE OF 7-DAY PERIOD.
-validateConditions(workDayDetails, 2);
+const workDayHours = workDayDetails.map( (item) =>  item.hours_rest);
+
+let result = leastHoursOff(workDayHours);
+
+let minimum = Math.min(...result);
+
+console.log(minimum)
